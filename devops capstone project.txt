@@ -1,0 +1,19 @@
+                                              devops capstone project 
+
+
+a microservices application with every language included deploy frontend direcly on ec2 with loadbalancer and asg 
+
+
+and deploy microservices on Kubernetes and dockerize everything 
+
+
+first run at the docker-compose level 
+
+then design an infrastructure for the whole setup and deploy a cicd pipeline for the setup with remote backend for terraform statefile 
+
+
+and deploy the whole application then 
+
+configure moniterning and logging 
+
+write scripts for backups and optimization 

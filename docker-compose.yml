@@ -1,0 +1,246 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    env_file: ./api-gateway/.env
+    networks:
+      - app-network    
+    depends_on:
+      - user-service
+      - order-service
+      - payment-service
+      - notification-service
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    env_file: ./frontend/.env
+    networks:
+      - app-network
+    depends_on:
+      - api-gateway
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "4000:4000"
+    env_file: ./user-service/.env
+    networks:
+      - app-network
+    depends_on:
+      - mysql
+      - redis-node-0
+      - redis-node-1
+      - redis-node-2
+      - redis-node-3
+      - redis-node-4
+      - redis-node-5
+
+  order-service:
+    build: ./order-service
+    networks:
+      - app-network
+    ports:
+      - "5000:5000"
+    env_file: ./order-service/.env
+    depends_on:
+      - mongodb
+      - redis-node-0
+      - redis-node-1
+      - redis-node-2
+      - redis-node-3
+      - redis-node-4
+      - redis-node-5
+
+  payment-service:
+    build: ./payment-service
+    networks:
+      - app-network
+    ports:
+      - "8081:8081"
+    env_file: ./payment-service/.env
+    depends_on:
+      - mysql
+      - redis-node-0
+      - redis-node-1
+      - redis-node-2
+      - redis-node-3
+      - redis-node-4
+      - redis-node-5
+
+  notification-service:
+    build: ./notification-service
+    networks:
+      - app-network
+    ports:
+      - "6000:6000"
+    env_file: ./notification-service/.env
+    depends_on:
+      - redis-node-0
+      - redis-node-1
+      - redis-node-2
+      - redis-node-3
+      - redis-node-4
+      - redis-node-5
+
+  mysql:
+    image: mysql:8.4
+    networks:
+      - app-network
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: usersdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  mongodb:
+    image: mongo:7.0
+    networks:
+      - app-network
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  redis-node-0:
+    image: bitnami/redis-cluster:latest
+    container_name: redis-node-0
+    environment:
+      - REDIS_PASSWORD=bitnami123
+      - REDIS_PORT_NUMBER=6379
+      - REDIS_CLUSTER_ANNOUNCE_IP=redis-node-0
+      - REDIS_NODES=redis-node-0:6379,redis-node-1:6379,redis-node-2:6379,redis-node-3:6379,redis-node-4:6379,redis-node-5:6379
+    volumes:
+      - redis-data-0:/bitnami
+    networks:
+      - app-network
+    ports:
+      - "7000:6379"
+
+  redis-node-1:
+    image: bitnami/redis-cluster:latest
+    container_name: redis-node-1
+    environment:
+      - REDIS_PASSWORD=bitnami123
+      - REDIS_PORT_NUMBER=6379
+      - REDIS_CLUSTER_ANNOUNCE_IP=redis-node-1
+      - REDIS_NODES=redis-node-0:6379,redis-node-1:6379,redis-node-2:6379,redis-node-3:6379,redis-node-4:6379,redis-node-5:6379
+    volumes:
+      - redis-data-1:/bitnami
+    networks:
+      - app-network
+    ports:
+      - "7001:6379"
+
+  redis-node-2:
+    image: bitnami/redis-cluster:latest
+    container_name: redis-node-2
+    environment:
+      - REDIS_PASSWORD=bitnami123
+      - REDIS_PORT_NUMBER=6379
+      - REDIS_CLUSTER_ANNOUNCE_IP=redis-node-2
+      - REDIS_NODES=redis-node-0:6379,redis-node-1:6379,redis-node-2:6379,redis-node-3:6379,redis-node-4:6379,redis-node-5:6379
+    volumes:
+      - redis-data-2:/bitnami
+    networks:
+      - app-network
+    ports:
+      - "7002:6379"
+
+  redis-node-3:
+    image: bitnami/redis-cluster:latest
+    container_name: redis-node-3
+    environment:
+      - REDIS_PASSWORD=bitnami123
+      - REDIS_PORT_NUMBER=6379
+      - REDIS_CLUSTER_ANNOUNCE_IP=redis-node-3
+      - REDIS_NODES=redis-node-0:6379,redis-node-1:6379,redis-node-2:6379,redis-node-3:6379,redis-node-4:6379,redis-node-5:6379
+    volumes:
+      - redis-data-3:/bitnami
+    networks:
+      - app-network
+    ports:
+      - "7003:6379"
+
+  redis-node-4:
+    image: bitnami/redis-cluster:latest
+    container_name: redis-node-4
+    environment:
+      - REDIS_PASSWORD=bitnami123
+      - REDIS_PORT_NUMBER=6379
+      - REDIS_CLUSTER_ANNOUNCE_IP=redis-node-4
+      - REDIS_NODES=redis-node-0:6379,redis-node-1:6379,redis-node-2:6379,redis-node-3:6379,redis-node-4:6379,redis-node-5:6379
+    volumes:
+      - redis-data-4:/bitnami
+    networks:
+      - app-network
+    ports:
+      - "7004:6379"
+
+  redis-node-5:
+    image: bitnami/redis-cluster:latest
+    container_name: redis-node-5
+    environment:
+      - REDIS_PASSWORD=bitnami123
+      - REDIS_PORT_NUMBER=6379
+      - REDIS_CLUSTER_ANNOUNCE_IP=redis-node-5
+      - REDIS_NODES=redis-node-0:6379,redis-node-1:6379,redis-node-2:6379,redis-node-3:6379,redis-node-4:6379,redis-node-5:6379
+    volumes:
+      - redis-data-5:/bitnami
+    networks:
+      - app-network
+    ports:
+      - "7005:6379"
+
+  cluster-init:
+    image: bitnami/redis-cluster:latest
+    depends_on:
+      - redis-node-0
+      - redis-node-1
+      - redis-node-2
+      - redis-node-3
+      - redis-node-4
+      - redis-node-5
+    networks:
+      - app-network
+    restart: "no"
+    command: >
+      bash -c '
+        echo "🔄 Waiting for Redis nodes to be ready..."
+        sleep 10
+        for NODE in redis-node-0 redis-node-1 redis-node-2 redis-node-3 redis-node-4 redis-node-5; do
+          until redis-cli -h $${NODE} -a bitnami123 ping | grep -q PONG; do
+            echo "Waiting for $${NODE}..."
+            sleep 2
+          done
+          echo "$${NODE} is ready!"
+        done
+        echo "🚀 Creating Redis Cluster..."
+        echo "yes" | redis-cli --cluster create \
+          redis-node-0:6379 redis-node-1:6379 redis-node-2:6379 \
+          redis-node-3:6379 redis-node-4:6379 redis-node-5:6379 \
+          --cluster-replicas 1 -a bitnami123
+        echo "✅ Cluster initialization completed."
+      '
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  mongo-data:
+  redis-data-0:
+  redis-data-1:
+  redis-data-2:
+  redis-data-3:
+  redis-data-4:
+  redis-data-5:
